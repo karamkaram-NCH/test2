@@ -267,7 +267,7 @@
     <div id="toast-container"></div>
     <div class="container" id="question">
       <h1 id="question-h1"></h1>
-      <div id="note">P.S.: You cannot press "No" 😜</div>
+      <div id="note">P.S.: You cannot choose "No" 😜</div>
       <button id="yesBtn">Yes</button>
       <button id="noBtn">
         <div id="noDiv">No</div>
@@ -497,7 +497,6 @@
           "touchstart",
           function (event) {
             if (event.touches.length > 1) {
-              console.log("t");
               event.preventDefault();
             }
           },
@@ -632,7 +631,7 @@
       function setMinDate() {
         const dateInput = document.getElementById("date-input");
         const tomorrow = new Date();
-        const isAfter6PM = tomorrow.getHours() > 12;
+        const isAfter6PM = tomorrow.getHours() > 18;
         tomorrow.setDate(tomorrow.getDate() + (isAfter6PM ? 1 : 0));
         const today = new Date(tomorrow);
         const yyyy = today.getFullYear();
