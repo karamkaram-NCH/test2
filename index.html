@@ -363,6 +363,7 @@
           noBtn.addEventListener("mousemove", moveNoButton);
           noBtn.classList.add("pc-no");
           yesBtn.classList.add("pc-yes");
+          yesBtn.addEventListener("click", onYesClick);
         }
 
         if (isYesClickedSaved === "true") {
@@ -372,12 +373,10 @@
 
       function startShared(stringDate) {
         questionSection.style.display = "block";
-        const yesBtn = document.getElementById("yesBtn");
         const questionH1 = document.getElementById("question-h1");
 
         questionH1.innerHTML = `Will you have dinner with me on ${stringDate}? <button id="time-btn">Change Day</button>`;
         // questionH1.innerHTML = ` hqwjhkfe hwefke fjhk e fjhkee fewke f${stringDate}? <button id="time-btn">Change Day</button>`;
-        yesBtn.addEventListener("click", onYesClick);
         const changeTime = document.getElementById("time-btn");
         changeTime && changeTime.addEventListener("click", openTimeSection);
       }
