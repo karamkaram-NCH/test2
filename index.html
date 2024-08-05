@@ -41,7 +41,6 @@
 
       button {
         padding: 10px 20px;
-        margin: 10px;
         font-size: 18px;
         cursor: pointer;
         border: none;
@@ -335,7 +334,7 @@
       });
 
       function start() {
-        let dateString = "2024-08-09";
+        let dateString = "2024-08-08";
         const device = detectDevice();
         const dateLocalStorage = localStorage.getItem("selected-date");
         const isYesClickedSaved = localStorage.getItem("yes_clicked");
@@ -358,6 +357,7 @@
           ball.addEventListener("touchstart", startDrag);
           noBtn.classList.add("mobile-no");
           yesBtn.classList.add("mobile-yes");
+          preventZoomAndScroll();
         } else {
           noBtn.addEventListener("mouseover", moveNoButton);
           noBtn.addEventListener("mousemove", moveNoButton);
@@ -376,7 +376,7 @@
         const questionH1 = document.getElementById("question-h1");
 
         questionH1.innerHTML = `Will you have dinner with me on ${stringDate}? <button id="time-btn">Change Day</button>`;
-        // questionH1.innerHTML = ` hqwjhkfe hwefke fjhk e fjhkee fewke f${stringDate}? <button id="time-btn">Change Day</button>`;
+        //questionH1.innerHTML = ` hqwjhkfe hwefke fjhk e fjhkee fewke f${stringDate}? <button id="time-btn">Change Day</button>`;
         const changeTime = document.getElementById("time-btn");
         changeTime && changeTime.addEventListener("click", openTimeSection);
       }
@@ -430,8 +430,13 @@
           const y =
             (touchMove ? event.touches[0].clientY : event.clientY) - initialY;
 
-          ball.style.left = `${x}px`;
-          ball.style.top = `${y}px`;
+          if (x < window.innerWidth - 30 && x > 0) {
+            ball.style.left = `${x}px`;
+          }
+
+          if (y < window.innerHeight - 30 && y > 0) {
+            ball.style.top = `${y}px`;
+          }
 
           const ballRect = ball.getBoundingClientRect();
           const noRect = noBtn.getBoundingClientRect();
@@ -452,7 +457,6 @@
 
             noBtn.style.top = `${newTop}px`;
             noBtn.style.left = `${newLeft}px`;
-            console.log([newTop, newLeft]);
             showToast(`Told you! "No" is not an option 😜`);
           }
         }
@@ -479,10 +483,60 @@
           ) {
             onYesClick();
           } else {
+            noBtn.style.left = "calc(50% - 60px)";
+            noBtn.style.top = "calc(10% - 25px)";
             ball.style.left = "calc(50% - 25px)";
             ball.style.top = "calc(100% - 70px)";
           }
         }
+      }
+
+      function preventZoomAndScroll() {
+        // Prevent zooming
+        document.addEventListener(
+          "touchstart",
+          function (event) {
+            if (event.touches.length > 1) {
+              console.log("t");
+              event.preventDefault();
+            }
+          },
+          { passive: false }
+        );
+
+        document.addEventListener(
+          "touchmove",
+          function (event) {
+            if (event.scale !== 1) {
+              event.preventDefault();
+            }
+          },
+          { passive: false }
+        );
+
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener(
+          "touchend",
+          function (event) {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+              event.preventDefault();
+            }
+            lastTouchEnd = now;
+          },
+          false
+        );
+
+        document.addEventListener(
+          "touchmove",
+          function (event) {
+            if (event.target !== ball) {
+              event.preventDefault();
+            }
+          },
+          { passive: false }
+        );
       }
 
       function onYesClick() {
@@ -495,6 +549,7 @@
 
       function openTimeSection() {
         timeSection.style.display = "block";
+        setMinDate();
         questionSection.style.display = "none";
         resultSection.style.display = "none";
         ball.style.display = "none";
@@ -575,9 +630,9 @@
       }
 
       function setMinDate() {
-        const dateInput = document.getElementById("date");
+        const dateInput = document.getElementById("date-input");
         const tomorrow = new Date();
-        const isAfter6PM = tomorrow.getHours() > 18;
+        const isAfter6PM = tomorrow.getHours() > 12;
         tomorrow.setDate(tomorrow.getDate() + (isAfter6PM ? 1 : 0));
         const today = new Date(tomorrow);
         const yyyy = today.getFullYear();
